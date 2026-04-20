@@ -43,38 +43,40 @@ Observations are placed **immediately after the section or statement they refer 
 
 Everything working as expected, optional testing details or comments
 
-> OK
+  > OK
 
 or
 
-> OK
-> tested by pressing all the buttons
-> I particularly liked the confetti at the end
+  > OK
+  > tested by pressing all the buttons
+  > I particularly liked the confetti at the end
 
 Mostly working:
 
-> PARTIAL
-> ...observations
+  > PARTIAL
+  > ...observations
 
 Not working:
 
-> FAILURE
-> ...observations
+  > FAILURE
+  > ...observations
 
 or
 
-> FAILED
-> ...observations
+  > FAILED
+  > ...observations
 
 Change Request:
 
-> CR
-> ...observations
+  > CR
+  > ...observations
 
 Specification Adjustment (no change to the implementation expected):
 
-> REVIEW
-> ...observations
+  > REVIEW
+  > ...observations
+
+*The examples provided here are INDENTED so that they do not show up in searches for observations. Natural observations MUST NOT be indented.*
 
 ### Resolution
 
@@ -88,6 +90,20 @@ Implementing actors search for block quotes and resolve them. `OK` observations 
 No audit trail is kept in the specifications files - git history is authoritative.
 
 It is good practice to start at the commit to be tested and add a commit with only the observations made by the testing actor, the commit message should reflect the scope of testing performed. If project management intends for branching on observations, then it must be explicitly called out in a *directive* file.
+
+### Operational Tools
+
+Collect all observations using this command:
+
+`grep -RIn --include='*.md' -E '^>' specs/`
+
+Collect all observations WITH context using this command:
+
+`grep -RIn -C 10 --include='*.md' -E '^>' specs/`
+
+Surface incorrectly indented observations using this command: (this will also show the examples in this file)
+
+`grep -RIn --include='*.md' -E '^[[:space:]]*>' specs/`
 
 ## Test Scripts
 
