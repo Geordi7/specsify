@@ -6,38 +6,64 @@
 `specs/` contains specifications and user test scripts as markdown (`.md`) files.
 - *specifications* describe *intended* behaviour, design decisions, and standards expected to be followed
 - *directives* (like `agents.md` or `claude.md`) describe how to work on the project
-- *code comments* should be reserved for local non-obvious logic
+- *code comments* should be reserved for local non-obvious logic and references to specifications
 
 In these documents an *actor* is either a human or an AI agent.
 
-## Top-level structure
+## Structure
 
-- `00-meta.md`         - this file, describes how the specs work
-- `01-requirements.md` - primary design drivers for the project
-- `02-architecture.md` - technical design and key decisions: components, stacks, interfaces, deployment
-- `03-data-model.md`   - structure of data and key persistence decisions
-- `04-design.md`       - external surface (UI or API) design and key decisions
+Specs are defined across a tree of files located in this directory. A directory listing (ls) must be sufficient to get a sense of how the project is specified. The goal is to have a coherent traversible set of specifications that an agent can pull from to get the context it needs.
 
-## Expansion and Refinement
+**CRITICAL:** Spec files must never exceed 150 lines. Once a domain grows beyond what is manageable in 150 lines, it must be split into refinements.
 
-Filenames use `##-lower-kebab-case` - Lowercase, hyphen-separated, ASCII only. No spaces.
+**CRITICAL:** Root domain specs for refined domains must never exceed 50 lines. A domain with refinements must have summaries for the refinements in its root domain file, and leave all detail to the refinements, excepting only *the most critical or globally applicable information* to be kept in the root.
 
-Additional domains use `##-other-domain.md` some suggestions:
-  `05-testing-standard.md`
-  `06-security-standard.md`
-  `07-user-experience.md`
+### Base
 
-Sub-domains use `##-##-sub-name.md` some examples:
-  `03-01-primary-database-model.md`
-  `03-02-memcache-model.md`
+Specs are defined in terms of domains which are numbered starting at zero. Throughout this document `##` denotes a zero-padded two-digit number (e.g., `02`, `03`). Every domain has a root file and may have refinements, the two required domains are:
 
-Test scripts use `##-T##-test-description.md` (see [## Test Scripts] below)
+| Domain File | Purpose |
+|-------------|---------|
+| `00-meta.md` | this file, describes how to operate in a specs driven project |
+| `01-requirements.md` | primary design drivers for the project |
+
+### Expansion
+
+Thereon domains are defined as needed using the `##-lower-kebab-case` convention. Most projects will need these:
+
+| Domain File | Purpose |
+|-------------|---------|
+| `02-architecture.md` | technical design and key decisions: components, stacks, interfaces, deployment |
+| `03-data-model.md` | structure of data and key persistence decisions |
+
+And other recommended domains are:
+
+| Domain File | Purpose |
+|-------------|---------|
+| `##-security-standard.md` | Capture explicit security related configuration constraints or requirements |
+| `##-design.md` | Capture external surface (UI or API) constraints and design |
+| `##-testing.md`| Capture testing strategy and tools (not for specific tests) |
+| `##-user-experience.md` | Capture constraints and design for intended user experience |
+
+### Refinement
+
+Once a domain is sufficiently large it should be split into refinements using the `##-##-sub-domain.md` convention. These can be further refined using `##-##-##-sub-sub-domain.md` and so on... Once a domain is refined parent files should become minimal summaries for their refinements so as not to pollute agent contexts. Some examples:
+
+Given `02-architecture.md` which contains short descriptions of the following:
+- `02-00-architecture-overview.md`
+- `02-01-coding-standard.md`
+- `02-02-persistence-layer.md`
+- `02-03-application-nodes.md`
+
+### Test Scripts
+
+Test scripts follow their own naming convention — see [Test Scripts](#test-scripts) below.
 
 ## QA and Observations
 
-QA activities record observations **in-situ** in the relevant specification file using block quotes. **Block quotes are reserved exclusively for QA observations - no other use is permitted.** To quote external material, use fenced code blocks for verbatim text or inline italics with attribution for short phrases.
+QA activities may record observations **in-situ** in the relevant specification file using block quotes. **Block quotes are reserved exclusively for QA observations - no other use is permitted.** To quote external material, use fenced code blocks for verbatim text or inline italics with attribution for short phrases.
 
-Observations are placed **immediately after the section or statement they refer to**, never floating at the top of a file. Multiple observations on the same thing stack in chronological order. Attribution is deliberately omitted - git blame is the source of truth.
+Observations are placed **immediately after the section or statement they refer to**, never floating at the top of a file. Multiple observations on the same thing stack in chronological order. Attribution is not needed - git blame is the source of truth.
 
 ### Observation conventions
 
@@ -51,21 +77,6 @@ or
   > tested by pressing all the buttons
   > I particularly liked the confetti at the end
 
-Mostly working:
-
-  > PARTIAL
-  > ...observations
-
-Not working:
-
-  > FAILURE
-  > ...observations
-
-or
-
-  > FAILED
-  > ...observations
-
 Change Request:
 
   > CR
@@ -76,20 +87,50 @@ Specification Adjustment (no change to the implementation expected):
   > REVIEW
   > ...observations
 
+All other issues: kinda works, doesn't work etc. (no change to specifications expected)
+
+  > ...observations
+
 *The examples provided here are INDENTED so that they do not show up in searches for observations. Natural observations MUST NOT be indented.*
 
 ### Resolution
 
-Implementing actors search for block quotes and resolve them. `OK` observations exist briefly so other actors can see "this was tested" in the working tree; once an implementing actor has acknowledged them they are removed.
+Implementing actors search for block quotes and resolve them. `OK` observations show "this was tested" in the working tree; once acknowledged they are removed.
 
 - **OK** - ephemeral. Acknowledge and remove.
-- **PARTIAL** / **FAILURE** - fix the code; if the observation reveals the spec is wrong, update the spec text too. Then remove the observation.
 - **CR** - update the spec (and tests where applicable) to reflect the new intent, then update the code to match, then remove the observation.
 - **REVIEW** - update the spec or tests to better reflect the intent
+- other: fix the issue
 
 No audit trail is kept in the specifications files - git history is authoritative.
 
-It is good practice to start at the commit to be tested and add a commit with only the observations made by the testing actor, the commit message should reflect the scope of testing performed. If project management intends for branching on observations, then it must be explicitly called out in a *directive* file.
+If testing outside the context of a change add a commit with only the observations made by the testing actor.
+
+## Test Scripts
+
+Any specification may be tested and have observations added as above. Additionally, specific **manual test scripts** for test actors may be added using the convention `{}-T##-test-description.md`, where `{}` is the full address of the corresponding domain or refinement. For example, a test script for `02-01-coding-standard.md` would be `02-01-T00-naming-rules.md`, and for the root `02-architecture.md` it would be `02-T00-smoke-test.md`. These should complement automated and agent tests, not replace them.
+
+Do not liberally create test scripts, expect that testers can perform most tests just by being prompted with the relevant specifications. Test scripts are intended for functionality which is ultra-critical or requires precise actions in order to properly test.
+
+## Operations
+
+Agents operating under this document should represent the key conventions of this document in their AGENTS.MD or equivalent — observation formats, resolution rules, change process, and test script conventions — along with the following specific operational instructions:
+
+### Specification Review
+
+Use `ls specs` to get an overview of the specification domains, those documents represent the intent of the project. Do not review `00-meta.md` unless you are making changes to your agent directives (agents.md or otherwise). Its contents should already be represented in your context. Never change `00-meta.md`, if you find it problematic discuss potential changes with a human operator.
+
+### Change Process:
+
+When asked to make a change, split the change into isolated activites and then follow these steps for each one:
+
+- Review relevant specifications to come up with an implementation plan.
+- Determine which specifications need to change, always consider requirements first
+- Make changes to specifications as needed. Remember to refine domains that have gotten too big (> 150 lines), and pare down parents to be spare (< 50 lines)
+- Perform changes to project files
+- Perform verification steps (automated testing, agent testing, uat, etc.) and correct as needed
+- Commit specs and project file changes to Git
+  - the changes in specs should reflect the intent of the commit, if you are not comfortable committing with a single summary phrase as commit message, then more work should be done on specs
 
 ### Operational Tools
 
@@ -104,11 +145,3 @@ Collect all observations WITH context using this command:
 Surface incorrectly indented observations using this command: (this will also show the examples in this file)
 
 `grep -RIn --include='*.md' -E '^[[:space:]]*>' specs/`
-
-## Test Scripts
-
-Any specification may be tested and have observations added as above. Additionally, specific **manual test scripts** may be added using the convention `##-T##-test-description.md`:
-
-    02-T01-installation-verification.md
-
-These are written for a testing actor and contain step-by-step instructions and acceptance criteria. Automated test suites live alongside the code they test (e.g., in `tests/` or `src/tests/`) and are not governed by this naming convention - they may, however, reference manual test specs.
