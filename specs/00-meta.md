@@ -120,17 +120,22 @@ Agents operating under this document should represent the key conventions of thi
 
 Use `ls specs` to get an overview of the specification domains, those documents represent the intent of the project. Do not review `00-meta.md` unless you are making changes to your agent directives (agents.md or otherwise). Its contents should already be represented in your context. Never change `00-meta.md`, if you find it problematic discuss potential changes with a human operator.
 
-### Change Process:
+### Change Process
 
-When asked to make a change, split the change into isolated activites and then follow these steps for each one:
+Before starting, scope the work: if the change touches more than one separable concern,
+divide it into independent activities now — splitting at commit time is too late.
+Then for each activity:
 
-- Review relevant specifications to come up with an implementation plan.
-- Determine which specifications need to change, always consider requirements first
-- Make changes to specifications as needed. Remember to refine domains that have gotten too big (> 150 lines), and pare down parents to be spare (< 50 lines)
-- Perform changes to project files
-- Perform verification steps (automated testing, agent testing, uat, etc.) and correct as needed
-- Commit specs and project file changes to Git
-  - the changes in specs should reflect the intent of the commit, if you are not comfortable committing with a single summary phrase as commit message, then more work should be done on specs
+- Review relevant specifications to form an implementation plan.
+- Determine which specifications need to change — always consider requirements first.
+- Update specifications as needed. Refine domains that exceed 150 lines; pare parent
+  files to < 50 lines once refined.
+- Make changes to project files.
+- Verify (automated tests, agent tests, UAT, etc.) and correct as needed.
+- Commit specs and project files together. The commit message is a label — one short
+  sentence, no rationale. The rationale lives in the spec changes. If you cannot
+  label the commit in one sentence, the spec changes are not clear enough yet; clarify
+  them before committing. A change is not complete until it is committed.
 
 ### Operational Tools
 
