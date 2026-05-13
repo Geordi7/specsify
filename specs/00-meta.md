@@ -12,11 +12,11 @@ In these documents an *actor* is either a human or an AI agent.
 
 ## Structure
 
-Specs are defined across a tree of files located in this directory. A directory listing (ls) must be sufficient to get a sense of how the project is specified. The goal is to have a coherent traversible set of specifications that an agent can pull from to get the context it needs.
+Specs are defined across a tree of files located in this directory. A directory listing (ls) must be sufficient to get a sense of how the project is specified. The goal is to have a coherent traversible set of specifications that an agent can pull from to get the context it needs. Specs are organized into top level 'domains' and 'refinements' and 'test suites' below them.
 
 **CRITICAL:** Spec files must never exceed 150 lines. Once a domain grows beyond what is manageable in 150 lines, it must be split into refinements.
 
-**CRITICAL:** Root domain specs for refined domains must never exceed 50 lines. A domain with refinements must have summaries for the refinements in its root domain file, and leave all detail to the refinements, excepting only *the most critical or globally applicable information* to be kept in the root.
+**CRITICAL:** Root domain specs for refined domains must never exceed 50 lines. A domain with refinements must have inline summaries for the refinements in its root domain file, and leave all detail to the refinements. Keep only *the most critical or globally applicable information* in the root.
 
 ### Base
 
@@ -50,7 +50,7 @@ And other recommended domains are:
 Once a domain is sufficiently large it should be split into refinements using the `##-##-sub-domain.md` convention. These can be further refined using `##-##-##-sub-sub-domain.md` and so on... Once a domain is refined parent files should become minimal summaries for their refinements so as not to pollute agent contexts. Some examples:
 
 Given `02-architecture.md` which contains short descriptions of the following:
-- `02-00-architecture-overview.md`
+- `02-00-modules-components.md`
 - `02-01-coding-standard.md`
 - `02-02-persistence-layer.md`
 - `02-03-application-nodes.md`
@@ -106,25 +106,26 @@ No audit trail is kept in the specifications files - git history is authoritativ
 
 If testing outside the context of a change add a commit with only the observations made by the testing actor.
 
-## Test Scripts
+## Test Suites
 
-Any specification may be tested and have observations added as above. Additionally, specific **manual test scripts** for test actors may be added using the convention `{}-T##-test-description.md`, where `{}` is the full address of the corresponding domain or refinement. For example, a test script for `02-01-coding-standard.md` would be `02-01-T00-naming-rules.md`, and for the root `02-architecture.md` it would be `02-T00-smoke-test.md`. These should complement automated and agent tests, not replace them.
+Any specification may be tested and have observations added as above. Additionally, specific **manual test suites** for test actors may be added using the convention `{}-T##-test-description.md`, where `{}` is the full address of the corresponding domain or refinement. For example, a test suite for `02-01-coding-standard.md` would be `02-01-T00-naming-rules.md`, and for the root `02-architecture.md` it would be `02-T00-smoke-test.md`. These should complement automated and agent tests, not replace them.
 
-Do not liberally create test scripts, expect that testers can perform most tests just by being prompted with the relevant specifications. Test scripts are intended for functionality which is ultra-critical or requires precise actions in order to properly test.
+Do not liberally create test suites, expect that testers can perform most tests just by being prompted with the relevant specifications. Test suites are intended for functionality which is ultra-critical or requires precise actions in order to properly test.
 
 ## Operations
 
-Agents operating under this document should represent the key conventions of this document in their AGENTS.MD or equivalent — observation formats, resolution rules, change process, and test script conventions — along with the following specific operational instructions:
+Agents operating in this project should always include this document in its entirety in their context window. Add relevant include-directives in AGENTS.md or equivalent. Agents can use the following tools to better navigate the specs:
 
 ### Specification Review
 
-Use `ls specs` to get an overview of the specification domains, those documents represent the intent of the project. Do not review `00-meta.md` unless you are making changes to your agent directives (agents.md or otherwise). Its contents should already be represented in your context. Never change `00-meta.md`, if you find it problematic discuss potential changes with a human operator.
+Use `ls specs` to get an map of the specification domains, those documents represent the intent of the project. Do not review `00-meta.md`, its contents should already be represented in your context. Never change `00-meta.md`, if you find it problematic discuss potential changes with a human operator.
 
 ### Change Process
 
 Before starting, scope the work: if the change touches more than one separable concern,
 divide it into independent activities now — splitting at commit time is too late.
-Then for each activity:
+
+For each activity:
 
 - Review relevant specifications to form an implementation plan.
 - Determine which specifications need to change — always consider requirements first.
