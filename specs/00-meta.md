@@ -61,50 +61,32 @@ Test scripts follow their own naming convention — see [Test Scripts](#test-scr
 
 ## QA and Observations
 
-QA activities may record observations **in-situ** in the relevant specification file using block quotes. **Block quotes are reserved exclusively for QA observations - no other use is permitted.** To quote external material, use fenced code blocks for verbatim text or inline italics with attribution for short phrases.
+QA activities record observations **in-situ** in the relevant specification file using HTML comments. An observation is invisible when the markdown is rendered but greppable in source, so it annotates the spec without disturbing its prose or its block quotes.
 
 Observations are placed **immediately after the section or statement they refer to**, never floating at the top of a file. Multiple observations on the same thing stack in chronological order. Attribution is not needed - git blame is the source of truth.
 
 ### Observation conventions
 
-Everything working as expected, optional testing details or comments
+Two forms, distinguished only by an optional `CR` tag:
 
-  > OK
+Plain observation - anything an implementer should look at (works but awkward, doesn't work, a question, a comment). Resolve by fixing the code, or the spec, as appropriate:
 
-or
+  <!-- OBS: ...observations -->
 
-  > OK
-  > tested by pressing all the buttons
-  > I particularly liked the confetti at the end
+Change Request - the *intended* behaviour is wrong; the spec itself must change first:
 
-Change Request:
+  <!-- OBS CR: ...observations -->
 
-  > CR
-  > ...observations
-
-Specification Adjustment (no change to the implementation expected):
-
-  > REVIEW
-  > ...observations
-
-All other issues: kinda works, doesn't work etc. (no change to specifications expected)
-
-  > ...observations
-
-*The examples provided here are INDENTED so that they do not show up in searches for observations. Natural observations MUST NOT be indented.*
+*The examples above are INDENTED so that they do not show up in searches for observations, which anchor the marker to the start of the line. Natural observations MUST NOT be indented.*
 
 ### Resolution
 
-Implementing actors search for block quotes and resolve them. `OK` observations show "this was tested" in the working tree; once acknowledged they are removed.
+Implementing actors search for observations and resolve each by fixing the source, then deleting the comment. No audit trail is kept in the specification files - git history is authoritative.
 
-- **OK** - ephemeral. Acknowledge and remove.
-- **CR** - update the spec (and tests where applicable) to reflect the new intent, then update the code to match, then remove the observation.
-- **REVIEW** - update the spec or tests to better reflect the intent
-- other: fix the issue
+- **CR** - update the spec (and tests where applicable) to reflect the new intent, then update the code to match, then delete the observation.
+- **plain** - fix the issue in code or spec as appropriate, then delete the observation.
 
-No audit trail is kept in the specifications files - git history is authoritative.
-
-If testing outside the context of a change add a commit with only the observations made by the testing actor.
+If testing outside the context of a change, add a commit containing only the observations made by the testing actor.
 
 ## Test Suites
 
@@ -142,12 +124,16 @@ For each activity:
 
 Collect all observations using this command:
 
-`grep -RIn --include='*.md' -E '^>' specs/`
+`grep -RIn --include='*.md' -E '^<!-- OBS' specs/`
 
 Collect all observations WITH context using this command:
 
-`grep -RIn -C 10 --include='*.md' -E '^>' specs/`
+`grep -RIn -C 10 --include='*.md' -E '^<!-- OBS' specs/`
+
+Collect only Change Requests using this command:
+
+`grep -RIn --include='*.md' -E '^<!-- OBS CR' specs/`
 
 Surface incorrectly indented observations using this command: (this will also show the examples in this file)
 
-`grep -RIn --include='*.md' -E '^[[:space:]]*>' specs/`
+`grep -RIn --include='*.md' -E '<!-- OBS' specs/`

@@ -40,8 +40,8 @@ in a specs-driven project. Its key directives:
 - Run `ls specs` for a domain overview before starting work
 - Follow the change process: scope → review specs → update specs → change code → verify → commit
 - Commit messages are labels only (one sentence). Rationale goes in the spec changes.
-- Record QA observations as block quotes directly in the relevant spec file
-- Resolve block-quote observations before marking work complete
+- Record QA observations as HTML comments (`<!-- OBS: ... -->`) directly in the relevant spec file
+- Resolve observation comments before marking work complete
 - Never modify `00-meta.md` without explicit instruction
 ```
 
@@ -53,7 +53,7 @@ An agent operating in a specsify project will:
 2. Read the relevant specs before planning changes
 3. Update specs *before or alongside* code changes (requirements first)
 4. Commit specs and code together — the commit message is a label, not a rationale
-5. Record QA findings as block-quote observations in the spec, not in separate documents
+5. Record QA findings as `<!-- OBS: ... -->` comments in the spec, not in separate documents
 6. Resolve observations before considering a change complete
 
 The result is a project where the specs stay current, every commit is traceable to intent, and any agent (or human) picking up the work can get oriented quickly.
