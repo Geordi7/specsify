@@ -55,44 +55,33 @@ Given `02-architecture.md` which contains short descriptions of the following:
 - `02-02-persistence-layer.md`
 - `02-03-application-nodes.md`
 
-### Test Scripts
+### Test Suite Files
 
-Test scripts follow their own naming convention — see [Test Scripts](#test-scripts) below.
+Manual test suites follow their own naming convention — see [Testing](#testing) below.
 
-## QA and Observations
+## Testing
 
-QA activities record observations **in-situ** in the relevant specification file using HTML comments. An observation is invisible when the markdown is rendered but greppable in source, so it annotates the spec without disturbing its prose or its block quotes.
+### Test Suites
 
-Observations are placed **immediately after the section or statement they refer to**, never floating at the top of a file. Multiple observations on the same thing stack in chronological order. Attribution is not needed - git blame is the source of truth.
-
-### Observation conventions
-
-Two forms, distinguished only by an optional `CR` tag:
-
-Plain observation - anything an implementer should look at (works but awkward, doesn't work, a question, a comment). Resolve by fixing the code, or the spec, as appropriate:
-
-  <!-- OBS: ...observations -->
-
-Change Request - the *intended* behaviour is wrong; the spec itself must change first:
-
-  <!-- OBS CR: ...observations -->
-
-*The examples above are INDENTED so that they do not show up in searches for observations, which anchor the marker to the start of the line. Natural observations MUST NOT be indented.*
-
-### Resolution
-
-Implementing actors search for observations and resolve each by fixing the source, then deleting the comment. No audit trail is kept in the specification files - git history is authoritative.
-
-- **CR** - update the spec (and tests where applicable) to reflect the new intent, then update the code to match, then delete the observation.
-- **plain** - fix the issue in code or spec as appropriate, then delete the observation.
-
-If testing outside the context of a change, add a commit containing only the observations made by the testing actor.
-
-## Test Suites
-
-Any specification may be tested and have observations added as above. Additionally, specific **manual test suites** for test actors may be added using the convention `{}-T##-test-description.md`, where `{}` is the full address of the corresponding domain or refinement. For example, a test suite for `02-01-coding-standard.md` would be `02-01-T00-naming-rules.md`, and for the root `02-architecture.md` it would be `02-T00-smoke-test.md`. These should complement automated and agent tests, not replace them.
+Any specification may be tested directly against its prose. Additionally, specific **manual test suites** for test actors may be added using the convention `{}-T##-test-description.md`, where `{}` is the full address of the corresponding domain or refinement. For example, a test suite for `02-01-coding-standard.md` would be `02-01-T00-naming-rules.md`, and for the root `02-architecture.md` it would be `02-T00-smoke-test.md`. These should complement automated and agent tests, not replace them.
 
 Do not liberally create test suites, expect that testers can perform most tests just by being prompted with the relevant specifications. Test suites are intended for functionality which is ultra-critical or requires precise actions in order to properly test.
+
+### Automated Tests
+
+Tests at any level — unit, integration, end-to-end — may be written against any part of the project. Whether a given test is warranted is the implementing actor's decision, weighed on risk, complexity, and the criticality of the requirement it serves. Where a test is warranted, it is written before the code that satisfies it.
+
+Every new or changed test must be **seen failing first**. In particular, if a test is written against already existing functionality, exercise it against a deliberately broken mock of that functionality FIRST, and iterate the mock until every assertion in the test has been shown to fail at least once. The mock lives separately from the real code — a stub, fake, or injected double — and the real code is never edited to produce the failure. Discard the mock once the test is verified; it must never reach a commit.
+
+In general:
+
+- Write the test, run it, keep the failure output.
+- The failure must be the *intended* one — an assertion on real behaviour, not an import, syntax, collection, or fixture error. Those mean the test is broken.
+- A test that never fails proves nothing. Fix the test, not the code.
+- Then implement (or point the test back at the real code), re-run, confirm it passes and breaks nothing else.
+- Bug fixes start with a test that reproduces the bug.
+
+State the observed failure and the subsequent pass when reporting verification. An actor who cannot show a test failing has not tested it.
 
 ## Operations
 
@@ -104,36 +93,13 @@ Use `ls specs` to get an map of the specification domains, those documents repre
 
 ### Change Process
 
-Before starting, scope the work: if the change touches more than one separable concern,
-divide it into independent activities now — splitting at commit time is too late.
+Before starting, scope the work: if the change touches more than one separable concern, divide it into independent activities now — splitting at commit time is too late.
 
 For each activity:
 
 - Review relevant specifications to form an implementation plan.
 - Determine which specifications need to change — always consider requirements first.
-- Update specifications as needed. Refine domains that exceed 150 lines; pare parent
-  files to < 50 lines once refined.
+- Update specifications as needed. Refine domains that exceed 150 lines; pare parent files to < 50 lines once refined.
 - Make changes to project files.
-- Verify (automated tests, agent tests, UAT, etc.) and correct as needed.
-- Commit specs and project files together. The commit message is a label — one short
-  sentence, no rationale. The rationale lives in the spec changes. If you cannot
-  label the commit in one sentence, the spec changes are not clear enough yet; clarify
-  them before committing. A change is not complete until it is committed.
-
-### Operational Tools
-
-Collect all observations using this command:
-
-`grep -RIn --include='*.md' -E '^<!-- OBS' specs/`
-
-Collect all observations WITH context using this command:
-
-`grep -RIn -C 10 --include='*.md' -E '^<!-- OBS' specs/`
-
-Collect only Change Requests using this command:
-
-`grep -RIn --include='*.md' -E '^<!-- OBS CR' specs/`
-
-Surface incorrectly indented observations using this command: (this will also show the examples in this file)
-
-`grep -RIn --include='*.md' -E '<!-- OBS' specs/`
+- Verify (automated tests — see [Automated Tests](#automated-tests) — agent tests, UAT, etc.) and correct as needed.
+- Commit specs and project files together. The commit message is a label — one short sentence, no rationale. The rationale lives in the spec changes. If you cannot label the commit in one sentence, the spec changes are not clear enough yet; clarify them before committing. A change is not complete until it is committed.

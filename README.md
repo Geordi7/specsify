@@ -25,7 +25,7 @@ your-project/
 
 Tell your agent to read `specs/00-meta.md` and to inform its agent directive file (`AGENTS.md` or `CLAUDE.md`).
 
-Then tell it what you want to build. I have tested this extensively with Claude-Code Sonnet and Opus, the agent consistently maintains the specifications and references them prevent specification drift and implementation sloppiness. It also massively accelerates accuracy on fresh sessions (they typically feel as on-point as long running contexts).
+Then tell it what you want to build. I have tested this extensively with Claude-Code Sonnet and Opus, the agent consistently maintains the specifications and references them to prevent specification drift and implementation sloppiness. It also massively accelerates accuracy on fresh sessions (they typically feel as on-point as long running contexts).
 
 The agent usually forgets to commit on every change, but after prompting it to do so the first time it 'twigs' and it is then consistent.
 
