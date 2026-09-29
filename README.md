@@ -1,6 +1,6 @@
 # Specsify
 
-A lightweight convention for organizing project knowledge into conveniently sized chunks so that AI agents can collect the information they need without bloating their context windows, allowing agents to operate consistently, apply correct judgment, and produce consistent and coherent output and 
+A lightweight convention for organizing project knowledge into conveniently sized chunks so that AI agents can collect the information they need without bloating their context windows, allowing agents to operate consistently, apply correct judgment, and produce consistent and coherent output.
 
 ## The idea
 
@@ -21,15 +21,15 @@ your-project/
     └── 01-requirements.md  ← fill this in a bit if you want
 ```
 
-**2. Write your `specs/01-requirements.md`.**
-
-This is the starting point for any project: what are the primary drivers? What is this thing for, and what must it do? Keep it under 150 lines; add more spec domains as the project grows.
-
-**3. Tell your agent about the specs system.**
+**2. Tell your agent about the specs system.**
 
 Tell your agent to read `specs/00-meta.md` and to inform its agent directive file (`AGENTS.md` or `CLAUDE.md`).
 
-Or add this manually:
+Then tell it what you want to build. I have tested this extensively with Claude-Code Sonnet and Opus, the agent consistently maintains the specifications and references them prevent specification drift and implementation sloppiness. It also massively accelerates accuracy on fresh sessions (they typically feel as on-point as long running contexts).
+
+The agent usually forgets to commit on every change, but after prompting it to do so the first time it 'twigs' and it is then consistent.
+
+If you want to manually inform `AGENTS.md` you can add this:
 
 ```markdown
 ## Specs
@@ -40,8 +40,7 @@ in a specs-driven project. Its key directives:
 - Run `ls specs` for a domain overview before starting work
 - Follow the change process: scope → review specs → update specs → change code → verify → commit
 - Commit messages are labels only (one sentence). Rationale goes in the spec changes.
-- Record QA observations as HTML comments (`<!-- OBS: ... -->`) directly in the relevant spec file
-- Resolve observation comments before marking work complete
+- Write tests first and see them fail for the intended reason before implementing
 - Never modify `00-meta.md` without explicit instruction
 ```
 
@@ -53,8 +52,7 @@ An agent operating in a specsify project will:
 2. Read the relevant specs before planning changes
 3. Update specs *before or alongside* code changes (requirements first)
 4. Commit specs and code together — the commit message is a label, not a rationale
-5. Record QA findings as `<!-- OBS: ... -->` comments in the spec, not in separate documents
-6. Resolve observations before considering a change complete
+5. Write each test first and watch it fail before writing the code that passes it
 
 The result is a project where the specs stay current, every commit is traceable to intent, and any agent (or human) picking up the work can get oriented quickly.
 
